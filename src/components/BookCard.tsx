@@ -1,21 +1,70 @@
-export const BookCard = ({ book }: { book: any }) => {
-  const cover = book.cover_i
-    ? `https://covers.openlibrary.org/b/id/${book.cover_i}-M.jpg`
-    : 'https://via.placeholder.com/150x220?text=No+Cover';
+import React from 'react';
+
+interface Book {
+  id: string;
+  title: string;
+  authors: string[];
+  imageLinks?: {
+    thumbnail?: string;
+  };
+  averageRating?: number;
+  ratingsCount?: number;
+}
+
+interface BookCardProps {
+  book: Book;
+}
+
+const BookCard: React.FC<BookCardProps> = ({ book }) => {
+  const renderStars = (rating: number) => {
+    const stars = [];
+    const fullStars = Math.floor(rating);
+    const hasHalfStar = rating % 1 !== 0;
+
+    for (let i = 0; i < fullStars; i++) {
+      stars.push(<span key={i} className="star">★</span>);
+    }
+
+    if (hasHalfStar) {
+      stars.push(<span key="half" className="star">★</span>);
+    }
+
+    const emptyStars = 5 - Math.ceil(rating);
+    for (let i = 0; i < emptyStars; i++) {
+      stars.push(<span key={`empty-${i}`} className="star empty">★</span>);
+    }
+
+    return stars;
+  };
 
   return (
-    <div className="bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden p-3">
-      <img src={cover} alt={book.title} className="w-full h-56 object-cover mb-3" />
-      <h2 className="text-lg font-semibold">{book.title}</h2>
-      <p className="text-sm text-gray-500 dark:text-gray-400">{book.author_name?.[0]}</p>
-      <a
-        href={`https://openlibrary.org${book.key}`}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="mt-2 inline-block text-blue-600 hover:underline text-sm"
-      >
-        View Book
-      </a>
+    <div className="book-card">
+      <div className="book-image-container">
+        <img
+          src={book.imageLinks?.thumbnail || '/api/placeholder/200/300'}
+          alt={book.title}
+          className="book-image"
+          onError={(e) => {
+            (e.target as HTMLImageElement).src = '/api/placeholder/200/300';
+          }}
+        />
+      </div>
+      <div className="book-info">
+        <h3 className="book-title">{book.title}</h3>
+        <p className="book-author">by {book.authors.join(', ')}</p>
+        {book.averageRating && (
+          <div className="book-rating">
+            <div className="stars">
+              {renderStars(book.averageRating)}
+            </div>
+            <span className="rating-text">
+              ({book.ratingsCount ? book.ratingsCount.toLocaleString() : '0'})
+            </span>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
+
+export default BookCard;

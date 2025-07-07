@@ -1,32 +1,38 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 
-interface Props {
+interface SearchBarProps {
   onSearch: (query: string) => void;
 }
 
-export const SearchBar = ({ onSearch }: Props) => {
-  const [input, setInput] = useState('');
+const SearchBar: React.FC<SearchBarProps> = ({ onSearch }) => {
+  const [query, setQuery] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (input.trim()) onSearch(input);
+    onSearch(query);
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setQuery(value);
+    
+    // Optional: Search as user types (with debouncing)
+    if (value.trim() === '') {
+      onSearch('');
+    }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex gap-2">
+    <form onSubmit={handleSubmit} className="search-container">
       <input
         type="text"
-        className="flex-1 px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800"
-        placeholder="Search for any book..."
-        value={input}
-        onChange={(e) => setInput(e.target.value)}
+        value={query}
+        onChange={handleInputChange}
+        placeholder="Search For a Book"
+        className="search-input"
       />
-      <button
-        type="submit"
-        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-      >
-        Search
-      </button>
     </form>
   );
 };
+
+export default SearchBar;
