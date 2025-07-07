@@ -1,4 +1,3 @@
-// src/components/Hero.tsx
 export const Hero = ({ onSearch }: { onSearch: (query: string) => void }) => {
   return (
     <section
