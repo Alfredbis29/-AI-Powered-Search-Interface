@@ -20,7 +20,7 @@ const POPULAR_BOOKS: Book[] = [
     title: 'It Starts with Us: A Novel',
     authors: ['Colleen Hoover'],
     imageLinks: {
-      thumbnail: 'https://covers.openlibrary.org/b/id/11258170-M.jpg', // ✅ Changed from Amazon
+      thumbnail: 'https://covers.openlibrary.org/b/id/11258170-M.jpg',
     },
     averageRating: 4.2,
     ratingsCount: 15420,
@@ -30,7 +30,7 @@ const POPULAR_BOOKS: Book[] = [
     title: 'Fairy Tale',
     authors: ['Stephen King'],
     imageLinks: {
-      thumbnail: 'https://covers.openlibrary.org/b/id/12619088-M.jpg', // ✅ Changed from Amazon
+      thumbnail: 'https://covers.openlibrary.org/b/id/12619088-M.jpg', 
     },
     averageRating: 4.1,
     ratingsCount: 8934,
@@ -40,7 +40,7 @@ const POPULAR_BOOKS: Book[] = [
     title: 'The Thursday Murder Club',
     authors: ['Richard Osman'],
     imageLinks: {
-      thumbnail: 'https://covers.openlibrary.org/b/id/8231856-M.jpg', // ✅ FIXED syntax here (removed extra quote)
+      thumbnail: 'https://covers.openlibrary.org/b/id/8231856-M.jpg',
     },
     averageRating: 4.3,
     ratingsCount: 12678,
@@ -50,7 +50,7 @@ const POPULAR_BOOKS: Book[] = [
     title: 'Normal People',
     authors: ['Sally Rooney'],
     imageLinks: {
-      thumbnail: 'https://covers.openlibrary.org/b/id/10301584-M.jpg', // ✅ Added missing image
+      thumbnail: 'https://covers.openlibrary.org/b/id/10301584-M.jpg',
     },
     averageRating: 4.0,
     ratingsCount: 23456,
@@ -75,6 +75,10 @@ function App() {
 
     setLoading(true);
     setShowResults(true);
+
+    const safirio = await fetch('https://api.safirio.africa/api/experiences');
+    const safirioData = await safirio.json();
+    console.log('Safirio Data:', safirioData);
 
     try {
       const response = await fetch(
