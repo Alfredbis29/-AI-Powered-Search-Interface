@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 interface SearchBarProps {
   onSearch: (query: string) => void;
@@ -7,27 +7,20 @@ interface SearchBarProps {
 const SearchBar: React.FC<SearchBarProps> = ({ onSearch }) => {
   const [query, setQuery] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  useEffect(() => {
     onSearch(query);
-  };
+  }, [query]);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setQuery(value);
-    
-    // Optional: Search as user types (with debouncing)
-    if (value.trim() === '') {
-      onSearch('');
-    }
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setQuery(e.target.value);
   };
 
   return (
-    <form onSubmit={handleSubmit} className="search-container">
+    <form onSubmit={(e) => e.preventDefault()} className="search-container">
       <input
         type="text"
         value={query}
-        onChange={handleInputChange}
+        onChange={handleChange}
         placeholder="Search For a Book"
         className="search-input"
       />
