@@ -12,6 +12,7 @@ interface Book {
   };
   averageRating?: number;
   ratingsCount?: number;
+  previewLink?: string; // ✅ Added
 }
 
 const POPULAR_BOOKS: Book[] = [
@@ -24,16 +25,18 @@ const POPULAR_BOOKS: Book[] = [
     },
     averageRating: 4.2,
     ratingsCount: 15420,
+    previewLink: 'https://books.google.com/books?id=1',
   },
   {
     id: '2',
     title: 'Fairy Tale',
     authors: ['Stephen King'],
     imageLinks: {
-      thumbnail: 'https://covers.openlibrary.org/b/id/12619088-M.jpg', 
+      thumbnail: 'https://covers.openlibrary.org/b/id/12619088-M.jpg',
     },
     averageRating: 4.1,
     ratingsCount: 8934,
+    previewLink: 'https://books.google.com/books?id=2',
   },
   {
     id: '3',
@@ -44,6 +47,7 @@ const POPULAR_BOOKS: Book[] = [
     },
     averageRating: 4.3,
     ratingsCount: 12678,
+    previewLink: 'https://books.google.com/books?id=3',
   },
   {
     id: '4',
@@ -54,6 +58,7 @@ const POPULAR_BOOKS: Book[] = [
     },
     averageRating: 4.0,
     ratingsCount: 23456,
+    previewLink: 'https://books.google.com/books?id=4',
   },
 ];
 
@@ -94,6 +99,7 @@ function App() {
           imageLinks: item.volumeInfo.imageLinks,
           averageRating: item.volumeInfo.averageRating,
           ratingsCount: item.volumeInfo.ratingsCount,
+          previewLink: item.volumeInfo.previewLink || item.volumeInfo.infoLink || '',
         }));
         setSearchResults(books);
       } else {

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 interface Book {
   id: string;
@@ -9,6 +9,7 @@ interface Book {
   };
   averageRating?: number;
   ratingsCount?: number;
+  previewLink?: string;
 }
 
 interface BookCardProps {
@@ -16,54 +17,77 @@ interface BookCardProps {
 }
 
 const BookCard: React.FC<BookCardProps> = ({ book }) => {
-  const renderStars = (rating: number) => {
-    const stars = [];
-    const fullStars = Math.floor(rating);
-    const hasHalfStar = rating % 1 !== 0;
-    const totalStars = hasHalfStar ? fullStars + 1 : fullStars;
-    const emptyStars = 5 - totalStars;
+  const rating = book.averageRating || 0;
 
-    for (let i = 0; i < fullStars; i++) {
-      stars.push(<span key={`full-${i}`} className="star text-yellow-400">★</span>);
+  const googleSearchUrl = `https://www.google.com/search?q=${encodeURIComponent(book.title)}`;
+
+  const previewUrl =
+    book.previewLink && book.previewLink.startsWith('http')
+      ? book.previewLink
+      : googleSearchUrl;
+
+  // Image fallback state
+  const [imgSrc, setImgSrc] = useState(
+    book.imageLinks?.thumbnail || 'https://via.placeholder.com/128x193?text=No+Image'
+  );
+
+  // On click, check if previewUrl exists, else redirect to Google Search
+  const handleClick = async (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
+    e.preventDefault();
+
+    try {
+      const response = await fetch(previewUrl, { method: 'HEAD' });
+
+      if (response.ok) {
+        window.open(previewUrl, '_blank', 'noopener,noreferrer');
+      } else {
+        // fallback to google search
+        window.open(googleSearchUrl, '_blank', 'noopener,noreferrer');
+      }
+    } catch (error) {
+      // fallback to google search on error
+      window.open(googleSearchUrl, '_blank', 'noopener,noreferrer');
     }
-
-    if (hasHalfStar) {
-      stars.push(<span key="half" className="star text-yellow-300">★</span>); // use different shade for visual half
-    }
-
-    for (let i = 0; i < emptyStars; i++) {
-      stars.push(<span key={`empty-${i}`} className="star text-gray-300">★</span>);
-    }
-
-    return stars;
   };
 
   return (
-    <div className="book-card">
+    <a
+      href={previewUrl}
+      onClick={handleClick}
+      className="book-card"
+      style={{ textDecoration: 'none', color: 'inherit' }}
+      aria-label={`Preview or search for book: ${book.title}`}
+    >
       <div className="book-image-container">
         <img
-          src={book.imageLinks?.thumbnail || '/default-cover.jpg'}
-          alt={book.title}
+          src={imgSrc}
+          alt={`Cover of ${book.title}`}
           className="book-image"
-          onError={(e) => {
-            (e.target as HTMLImageElement).src = '/default-cover.jpg';
-          }}
+          onError={() =>
+            setImgSrc('https://via.placeholder.com/128x193?text=No+Image')
+          }
         />
       </div>
       <div className="book-info">
-        <h3 className="book-title">{book.title || 'Unknown Title'}</h3>
-        <p className="book-author">by {book.authors?.join(', ') || 'Unknown Author'}</p>
-
-        {book.averageRating !== undefined && (
-          <div className="book-rating">
-            <div className="stars">{renderStars(book.averageRating)}</div>
-            <span className="rating-text">
-              ({book.ratingsCount?.toLocaleString() || '0'})
-            </span>
+        <h3 className="book-title">{book.title}</h3>
+        <p className="book-author">by {book.authors.join(', ')}</p>
+        <div className="book-rating">
+          <div className="stars">
+            {[1, 2, 3, 4, 5].map((star) => (
+              <span
+                key={star}
+                className={`star ${rating >= star ? 'filled' : 'empty'}`}
+              >
+                ★
+              </span>
+            ))}
           </div>
-        )}
+          {book.ratingsCount !== undefined && (
+            <span className="rating-text">({book.ratingsCount})</span>
+          )}
+        </div>
       </div>
-    </div>
+    </a>
   );
 };
 
