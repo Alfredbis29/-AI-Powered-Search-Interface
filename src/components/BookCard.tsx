@@ -26,12 +26,12 @@ const BookCard: React.FC<BookCardProps> = ({ book }) => {
       ? book.previewLink
       : googleSearchUrl;
 
-  // Image fallback state
+  
   const [imgSrc, setImgSrc] = useState(
     book.imageLinks?.thumbnail || 'https://via.placeholder.com/128x193?text=No+Image'
   );
 
-  // On click, check if previewUrl exists, else redirect to Google Search
+  
   const handleClick = async (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
     e.preventDefault();
 
@@ -41,11 +41,11 @@ const BookCard: React.FC<BookCardProps> = ({ book }) => {
       if (response.ok) {
         window.open(previewUrl, '_blank', 'noopener,noreferrer');
       } else {
-        // fallback to google search
+        
         window.open(googleSearchUrl, '_blank', 'noopener,noreferrer');
       }
     } catch (error) {
-      // fallback to google search on error
+      
       window.open(googleSearchUrl, '_blank', 'noopener,noreferrer');
     }
   };
@@ -78,7 +78,6 @@ const BookCard: React.FC<BookCardProps> = ({ book }) => {
                 key={star}
                 className={`star ${rating >= star ? 'filled' : 'empty'}`}
               >
-                ★
               </span>
             ))}
           </div>
