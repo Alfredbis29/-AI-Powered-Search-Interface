@@ -1,35 +1,156 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React, { useState } from 'react';
+import './App.css';
+import BookCard from './components/BookCard';
+import SearchBar from './components/SearchBar';
 
-function App() {
-  const [count, setCount] = useState(0)
-
-  return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+interface Book {
+  id: string;
+  title: string;
+  authors: string[];
+  imageLinks?: {
+    thumbnail?: string;
+  };
+  averageRating?: number;
+  ratingsCount?: number;
+  previewLink?: string; // ✅ Added
 }
 
-export default App
+const POPULAR_BOOKS: Book[] = [
+  {
+    id: '1',
+    title: 'It Starts with Us: A Novel',
+    authors: ['Colleen Hoover'],
+    imageLinks: {
+      thumbnail: 'https://covers.openlibrary.org/b/id/11258170-M.jpg',
+    },
+    averageRating: 4.2,
+    ratingsCount: 15420,
+    previewLink: 'https://books.google.com/books?id=1',
+  },
+  {
+    id: '2',
+    title: 'Fairy Tale',
+    authors: ['Stephen King'],
+    imageLinks: {
+      thumbnail: 'https://covers.openlibrary.org/b/id/12619088-M.jpg',
+    },
+    averageRating: 4.1,
+    ratingsCount: 8934,
+    previewLink: 'https://books.google.com/books?id=2',
+  },
+  {
+    id: '3',
+    title: 'The Thursday Murder Club',
+    authors: ['Richard Osman'],
+    imageLinks: {
+      thumbnail: 'https://covers.openlibrary.org/b/id/8231856-M.jpg',
+    },
+    averageRating: 4.3,
+    ratingsCount: 12678,
+    previewLink: 'https://books.google.com/books?id=3',
+  },
+  {
+    id: '4',
+    title: 'Normal People',
+    authors: ['Sally Rooney'],
+    imageLinks: {
+      thumbnail: 'https://covers.openlibrary.org/b/id/10301584-M.jpg',
+    },
+    averageRating: 4.0,
+    ratingsCount: 23456,
+    previewLink: 'https://books.google.com/books?id=4',
+  },
+];
+
+function App() {
+  const [searchResults, setSearchResults] = useState<Book[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [showResults, setShowResults] = useState(false);
+
+  const handleSearch = async (query: string) => {
+    const trimmedQuery = query.trim();
+    setSearchQuery(trimmedQuery);
+
+    if (!trimmedQuery) {
+      setShowResults(false);
+      setSearchResults([]);
+      return;
+    }
+
+    setLoading(true);
+    setShowResults(true);
+
+    const safirio = await fetch('https://api.safirio.africa/api/experiences');
+    const safirioData = await safirio.json();
+    console.log('Safirio Data:', safirioData);
+
+    try {
+      const response = await fetch(
+        `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(trimmedQuery)}&maxResults=20`
+      );
+      const data = await response.json();
+
+      if (data.items) {
+        const books: Book[] = data.items.map((item: any) => ({
+          id: item.id,
+          title: item.volumeInfo.title || 'Unknown Title',
+          authors: item.volumeInfo.authors || ['Unknown Author'],
+          imageLinks: item.volumeInfo.imageLinks,
+          averageRating: item.volumeInfo.averageRating,
+          ratingsCount: item.volumeInfo.ratingsCount,
+          previewLink: item.volumeInfo.previewLink || item.volumeInfo.infoLink || '',
+        }));
+        setSearchResults(books);
+      } else {
+        setSearchResults([]);
+      }
+    } catch (error) {
+      console.error('Error searching for books:', error);
+      setSearchResults([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="app">
+      <div className="hero-section">
+        <h1 className="hero-title">Find your next book to read.</h1>
+        <SearchBar onSearch={handleSearch} />
+      </div>
+
+      {!showResults && (
+        <div className="content-section">
+          <h2 className="section-title">Popular</h2>
+          <div className="books-grid">
+            {POPULAR_BOOKS.map((book) => (
+              <BookCard key={book.id} book={book} />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {showResults && (
+        <div className="results-section">
+          <h2 className="section-title">Results</h2>
+          {loading ? (
+            <div className="loading">Searching for books...</div>
+          ) : searchResults.length > 0 ? (
+            <div className="books-grid">
+              {searchResults.map((book) => (
+                <BookCard key={book.id} book={book} />
+              ))}
+            </div>
+          ) : (
+            <div className="no-results">
+              No books found for "{searchQuery}". Try a different search term.
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default App;
