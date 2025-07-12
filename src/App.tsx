@@ -4,7 +4,7 @@ import BookCard from './components/BookCard';
 import SearchBar from './components/SearchBar';
 
 interface Book {
-  id: string; // This should be the real Google Books volume ID
+  id: string; // This should be the real Google Books volume ID that i used to fetch book details
   title: string;
   authors: string[];
   imageLinks?: {
@@ -17,7 +17,7 @@ interface Book {
 
 const POPULAR_BOOKS: Book[] = [
   {
-    id: 'CwJfEAAAQBAJ', // Real Google Books volume ID for "It Starts with Us: A Novel"
+    id: 'CwJfEAAAQBAJ',
     title: 'It Starts with Us: A Novel',
     authors: ['Colleen Hoover'],
     imageLinks: {
@@ -28,7 +28,7 @@ const POPULAR_BOOKS: Book[] = [
     description: 'A powerful sequel in the It Ends With Us series.',
   },
   {
-    id: '7dLGDwAAQBAJ', // Real Google Books volume ID for "Fairy Tale"
+    id: '7dLGDwAAQBAJ',
     title: 'Fairy Tale',
     authors: ['Stephen King'],
     imageLinks: {
@@ -39,7 +39,7 @@ const POPULAR_BOOKS: Book[] = [
     description: 'A dark fantasy thriller by the master of horror.',
   },
   {
-    id: 'PwgOEAAAQBAJ', // Real Google Books volume ID for "The Thursday Murder Club"
+    id: 'PwgOEAAAQBAJ', 
     title: 'The Thursday Murder Club',
     authors: ['Richard Osman'],
     imageLinks: {
@@ -50,7 +50,7 @@ const POPULAR_BOOKS: Book[] = [
     description: 'A witty mystery set in a retirement village.',
   },
   {
-    id: 'zN3rDwAAQBAJ', // Real Google Books volume ID for "Normal People"
+    id: 'zN3rDwAAQBAJ',
     title: 'Normal People',
     authors: ['Sally Rooney'],
     imageLinks: {
@@ -71,7 +71,7 @@ function App() {
   const handleSearch = async (query: string) => {
     const trimmedQuery = query.trim();
     setSearchQuery(trimmedQuery);
-    setSelectedBook(null); // clear current selection
+    setSelectedBook(null);
 
     if (!trimmedQuery) {
       setSearchResults([]);
