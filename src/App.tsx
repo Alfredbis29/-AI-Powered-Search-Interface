@@ -4,7 +4,7 @@ import BookCard from './components/BookCard';
 import SearchBar from './components/SearchBar';
 
 interface Book {
-  id: string;
+  id: string; // This should be the real Google Books volume ID that i used to fetch book details
   title: string;
   authors: string[];
   imageLinks?: {
@@ -12,12 +12,12 @@ interface Book {
   };
   averageRating?: number;
   ratingsCount?: number;
-  previewLink?: string; // ✅ Added
+  description?: string;
 }
 
 const POPULAR_BOOKS: Book[] = [
   {
-    id: '1',
+    id: 'CwJfEAAAQBAJ',
     title: 'It Starts with Us: A Novel',
     authors: ['Colleen Hoover'],
     imageLinks: {
@@ -25,10 +25,10 @@ const POPULAR_BOOKS: Book[] = [
     },
     averageRating: 4.2,
     ratingsCount: 15420,
-    previewLink: 'https://books.google.com/books?id=1',
+    description: 'A powerful sequel in the It Ends With Us series.',
   },
   {
-    id: '2',
+    id: '7dLGDwAAQBAJ',
     title: 'Fairy Tale',
     authors: ['Stephen King'],
     imageLinks: {
@@ -36,10 +36,10 @@ const POPULAR_BOOKS: Book[] = [
     },
     averageRating: 4.1,
     ratingsCount: 8934,
-    previewLink: 'https://books.google.com/books?id=2',
+    description: 'A dark fantasy thriller by the master of horror.',
   },
   {
-    id: '3',
+    id: 'PwgOEAAAQBAJ', 
     title: 'The Thursday Murder Club',
     authors: ['Richard Osman'],
     imageLinks: {
@@ -47,10 +47,10 @@ const POPULAR_BOOKS: Book[] = [
     },
     averageRating: 4.3,
     ratingsCount: 12678,
-    previewLink: 'https://books.google.com/books?id=3',
+    description: 'A witty mystery set in a retirement village.',
   },
   {
-    id: '4',
+    id: 'zN3rDwAAQBAJ',
     title: 'Normal People',
     authors: ['Sally Rooney'],
     imageLinks: {
@@ -58,7 +58,7 @@ const POPULAR_BOOKS: Book[] = [
     },
     averageRating: 4.0,
     ratingsCount: 23456,
-    previewLink: 'https://books.google.com/books?id=4',
+    description: 'An intimate love story by bestselling author Sally Rooney.',
   },
 ];
 
@@ -66,25 +66,19 @@ function App() {
   const [searchResults, setSearchResults] = useState<Book[]>([]);
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [showResults, setShowResults] = useState(false);
+  const [selectedBook, setSelectedBook] = useState<Book | null>(null);
 
   const handleSearch = async (query: string) => {
     const trimmedQuery = query.trim();
     setSearchQuery(trimmedQuery);
+    setSelectedBook(null);
 
     if (!trimmedQuery) {
-      setShowResults(false);
       setSearchResults([]);
       return;
     }
 
     setLoading(true);
-    setShowResults(true);
-
-    const safirio = await fetch('https://api.safirio.africa/api/experiences');
-    const safirioData = await safirio.json();
-    console.log('Safirio Data:', safirioData);
-
     try {
       const response = await fetch(
         `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(trimmedQuery)}&maxResults=20`
@@ -99,14 +93,14 @@ function App() {
           imageLinks: item.volumeInfo.imageLinks,
           averageRating: item.volumeInfo.averageRating,
           ratingsCount: item.volumeInfo.ratingsCount,
-          previewLink: item.volumeInfo.previewLink || item.volumeInfo.infoLink || '',
+          description: item.volumeInfo.description,
         }));
         setSearchResults(books);
       } else {
         setSearchResults([]);
       }
     } catch (error) {
-      console.error('Error searching for books:', error);
+      console.error('Error fetching books:', error);
       setSearchResults([]);
     } finally {
       setLoading(false);
@@ -120,34 +114,61 @@ function App() {
         <SearchBar onSearch={handleSearch} />
       </div>
 
-      {!showResults && (
-        <div className="content-section">
-          <h2 className="section-title">Popular</h2>
-          <div className="books-grid">
-            {POPULAR_BOOKS.map((book) => (
-              <BookCard key={book.id} book={book} />
-            ))}
-          </div>
+      {selectedBook ? (
+        <div className="book-detail content-section">
+          <button onClick={() => setSelectedBook(null)}>⬅ Back</button>
+          <h2 className="section-title">{selectedBook.title}</h2>
+          <p><strong>Authors:</strong> {selectedBook.authors.join(', ')}</p>
+          {selectedBook.imageLinks?.thumbnail && (
+            <img
+              src={selectedBook.imageLinks.thumbnail}
+              alt={selectedBook.title}
+              style={{ maxWidth: '150px', marginBottom: '20px' }}
+            />
+          )}
+          <iframe
+            title="Book Preview"
+            src={`https://books.google.com/books?id=${selectedBook.id}&printsec=frontcover&output=embed`}
+            width="100%"
+            height="600px"
+            allowFullScreen
+          />
+          <p style={{ marginTop: '20px' }}>
+            <strong>Description:</strong> {selectedBook.description || 'No description available.'}
+          </p>
         </div>
-      )}
-
-      {showResults && (
-        <div className="results-section">
-          <h2 className="section-title">Results</h2>
-          {loading ? (
-            <div className="loading">Searching for books...</div>
-          ) : searchResults.length > 0 ? (
-            <div className="books-grid">
-              {searchResults.map((book) => (
-                <BookCard key={book.id} book={book} />
-              ))}
-            </div>
-          ) : (
-            <div className="no-results">
-              No books found for "{searchQuery}". Try a different search term.
+      ) : (
+        <>
+          {!searchQuery && (
+            <div className="content-section">
+              <h2 className="section-title">Popular Books</h2>
+              <div className="books-grid">
+                {POPULAR_BOOKS.map((book) => (
+                  <BookCard key={book.id} book={book} onClick={() => setSelectedBook(book)} />
+                ))}
+              </div>
             </div>
           )}
-        </div>
+
+          {searchQuery && (
+            <div className="results-section">
+              <h2 className="section-title">Results</h2>
+              {loading ? (
+                <div className="loading">Searching for books...</div>
+              ) : searchResults.length > 0 ? (
+                <div className="books-grid">
+                  {searchResults.map((book) => (
+                    <BookCard key={book.id} book={book} onClick={() => setSelectedBook(book)} />
+                  ))}
+                </div>
+              ) : (
+                <div className="no-results">
+                  No books found for "{searchQuery}". Try a different search term.
+                </div>
+              )}
+            </div>
+          )}
+        </>
       )}
     </div>
   );
