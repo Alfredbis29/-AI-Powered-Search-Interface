@@ -4,7 +4,7 @@ import BookCard from './components/BookCard';
 import SearchBar from './components/SearchBar';
 
 interface Book {
-  id: string;
+  id: string; // This should be the real Google Books volume ID
   title: string;
   authors: string[];
   imageLinks?: {
@@ -17,7 +17,7 @@ interface Book {
 
 const POPULAR_BOOKS: Book[] = [
   {
-    id: '1',
+    id: 'CwJfEAAAQBAJ', // Real Google Books volume ID for "It Starts with Us: A Novel"
     title: 'It Starts with Us: A Novel',
     authors: ['Colleen Hoover'],
     imageLinks: {
@@ -28,7 +28,7 @@ const POPULAR_BOOKS: Book[] = [
     description: 'A powerful sequel in the It Ends With Us series.',
   },
   {
-    id: '2',
+    id: '7dLGDwAAQBAJ', // Real Google Books volume ID for "Fairy Tale"
     title: 'Fairy Tale',
     authors: ['Stephen King'],
     imageLinks: {
@@ -39,7 +39,7 @@ const POPULAR_BOOKS: Book[] = [
     description: 'A dark fantasy thriller by the master of horror.',
   },
   {
-    id: '3',
+    id: 'PwgOEAAAQBAJ', // Real Google Books volume ID for "The Thursday Murder Club"
     title: 'The Thursday Murder Club',
     authors: ['Richard Osman'],
     imageLinks: {
@@ -50,7 +50,7 @@ const POPULAR_BOOKS: Book[] = [
     description: 'A witty mystery set in a retirement village.',
   },
   {
-    id: '4',
+    id: 'zN3rDwAAQBAJ', // Real Google Books volume ID for "Normal People"
     title: 'Normal People',
     authors: ['Sally Rooney'],
     imageLinks: {
