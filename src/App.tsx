@@ -4,7 +4,7 @@ import BookCard from './components/BookCard';
 import SearchBar from './components/SearchBar';
 
 interface Book {
-  id: string; // This should be the real Google Books volume ID that i used to fetch book details
+  id: string;
   title: string;
   authors: string[];
   imageLinks?: {
@@ -39,7 +39,7 @@ const POPULAR_BOOKS: Book[] = [
     description: 'A dark fantasy thriller by the master of horror.',
   },
   {
-    id: 'PwgOEAAAQBAJ', 
+    id: 'PwgOEAAAQBAJ',
     title: 'The Thursday Murder Club',
     authors: ['Richard Osman'],
     imageLinks: {
@@ -67,6 +67,10 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedBook, setSelectedBook] = useState<Book | null>(null);
+  const [favorites, setFavorites] = useState<Book[]>(() => {
+    const saved = localStorage.getItem('favorites');
+    return saved ? JSON.parse(saved) : [];
+  });
 
   const handleSearch = async (query: string) => {
     const trimmedQuery = query.trim();
@@ -107,6 +111,20 @@ function App() {
     }
   };
 
+  const toggleFavorite = (book: Book) => {
+    const exists = favorites.find((fav) => fav.id === book.id);
+    let updatedFavorites;
+    if (exists) {
+      updatedFavorites = favorites.filter((fav) => fav.id !== book.id);
+    } else {
+      updatedFavorites = [...favorites, book];
+    }
+    setFavorites(updatedFavorites);
+    localStorage.setItem('favorites', JSON.stringify(updatedFavorites));
+  };
+
+  const isFavorite = (bookId: string) => favorites.some((b) => b.id === bookId);
+
   return (
     <div className="app">
       <div className="hero-section">
@@ -119,6 +137,7 @@ function App() {
           <button onClick={() => setSelectedBook(null)}>⬅ Back</button>
           <h2 className="section-title">{selectedBook.title}</h2>
           <p><strong>Authors:</strong> {selectedBook.authors.join(', ')}</p>
+
           {selectedBook.imageLinks?.thumbnail && (
             <img
               src={selectedBook.imageLinks.thumbnail}
@@ -126,6 +145,7 @@ function App() {
               style={{ maxWidth: '150px', marginBottom: '20px' }}
             />
           )}
+
           <iframe
             title="Book Preview"
             src={`https://books.google.com/books?id=${selectedBook.id}&printsec=frontcover&output=embed`}
@@ -133,24 +153,53 @@ function App() {
             height="600px"
             allowFullScreen
           />
+
+          <div style={{ marginTop: '15px' }}>
+            <a
+              href={`https://books.google.com/books?id=${selectedBook.id}&printsec=frontcover`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="download-button"
+            >
+              📥 View/Download on Google Books
+            </a>
+          </div>
+
+          <button onClick={() => toggleFavorite(selectedBook)} style={{ marginTop: '15px' }}>
+            {isFavorite(selectedBook.id) ? '💔 Remove from Favorites' : '❤️ Add to Favorites'}
+          </button>
+
           <p style={{ marginTop: '20px' }}>
             <strong>Description:</strong> {selectedBook.description || 'No description available.'}
           </p>
         </div>
       ) : (
         <>
-          {!searchQuery && (
-            <div className="content-section">
-              <h2 className="section-title">Popular Books</h2>
-              <div className="books-grid">
-                {POPULAR_BOOKS.map((book) => (
-                  <BookCard key={book.id} book={book} onClick={() => setSelectedBook(book)} />
-                ))}
+          {searchQuery.trim() === '' && (
+            <>
+              {favorites.length > 0 && (
+                <div className="content-section">
+                  <h2 className="section-title">Your Favorite Books</h2>
+                  <div className="books-grid">
+                    {favorites.map((book) => (
+                      <BookCard key={book.id} book={book} onClick={() => setSelectedBook(book)} />
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <div className="content-section">
+                <h2 className="section-title">Popular Books</h2>
+                <div className="books-grid">
+                  {POPULAR_BOOKS.map((book) => (
+                    <BookCard key={book.id} book={book} onClick={() => setSelectedBook(book)} />
+                  ))}
+                </div>
               </div>
-            </div>
+            </>
           )}
 
-          {searchQuery && (
+          {searchQuery.trim() !== '' && (
             <div className="results-section">
               <h2 className="section-title">Results</h2>
               {loading ? (
