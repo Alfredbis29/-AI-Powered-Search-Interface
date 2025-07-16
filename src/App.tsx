@@ -123,6 +123,12 @@ function App() {
     localStorage.setItem('favorites', JSON.stringify(updatedFavorites));
   };
 
+  const removeFavorite = (bookId: string) => {
+    const updatedFavorites = favorites.filter((book) => book.id !== bookId);
+    setFavorites(updatedFavorites);
+    localStorage.setItem('favorites', JSON.stringify(updatedFavorites));
+  };
+
   const isFavorite = (bookId: string) => favorites.some((b) => b.id === bookId);
 
   return (
@@ -182,7 +188,17 @@ function App() {
                   <h2 className="section-title">Your Favorite Books</h2>
                   <div className="books-grid">
                     {favorites.map((book) => (
-                      <BookCard key={book.id} book={book} onClick={() => setSelectedBook(book)} />
+                      <div key={book.id}>
+                        <BookCard book={book} onClick={() => setSelectedBook(book)} />
+                        <div style={{ textAlign: 'center', marginTop: '8px' }}>
+                          <button
+                            onClick={() => removeFavorite(book.id)}
+                            className="delete-button"
+                          >
+                            🗑️ Remove
+                          </button>
+                        </div>
+                      </div>
                     ))}
                   </div>
                 </div>
