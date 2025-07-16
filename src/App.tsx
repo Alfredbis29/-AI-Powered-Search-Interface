@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './App.css';
 import BookCard from './components/BookCard';
 import SearchBar from './components/SearchBar';
@@ -67,10 +67,14 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedBook, setSelectedBook] = useState<Book | null>(null);
-  const [favorites, setFavorites] = useState<Book[]>(() => {
+  const [favorites, setFavorites] = useState<Book[]>([]);
+
+  useEffect(() => {
     const saved = localStorage.getItem('favorites');
-    return saved ? JSON.parse(saved) : [];
-  });
+    if (saved) {
+      setFavorites(JSON.parse(saved));
+    }
+  }, []);
 
   const handleSearch = async (query: string) => {
     const trimmedQuery = query.trim();
@@ -112,15 +116,13 @@ function App() {
   };
 
   const toggleFavorite = (book: Book) => {
-    const exists = favorites.find((fav) => fav.id === book.id);
-    let updatedFavorites;
-    if (exists) {
-      updatedFavorites = favorites.filter((fav) => fav.id !== book.id);
-    } else {
-      updatedFavorites = [...favorites, book];
-    }
-    setFavorites(updatedFavorites);
-    localStorage.setItem('favorites', JSON.stringify(updatedFavorites));
+    const exists = favorites.some((fav) => fav.id === book.id);
+    const updated = exists
+      ? favorites.filter((fav) => fav.id !== book.id)
+      : [...favorites, book];
+
+    setFavorites(updated);
+    localStorage.setItem('favorites', JSON.stringify(updated));
   };
 
   const removeFavorite = (bookId: string) => {
@@ -129,6 +131,7 @@ function App() {
     localStorage.setItem('favorites', JSON.stringify(updatedFavorites));
   };
 
+  
   const isFavorite = (bookId: string) => favorites.some((b) => b.id === bookId);
 
   return (
@@ -181,7 +184,7 @@ function App() {
         </div>
       ) : (
         <>
-          {searchQuery.trim() === '' && (
+          {!searchQuery && (
             <>
               {favorites.length > 0 && (
                 <div className="content-section">
@@ -215,7 +218,7 @@ function App() {
             </>
           )}
 
-          {searchQuery.trim() !== '' && (
+          {searchQuery && (
             <div className="results-section">
               <h2 className="section-title">Results</h2>
               {loading ? (
