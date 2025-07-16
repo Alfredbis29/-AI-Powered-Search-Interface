@@ -200,6 +200,7 @@ body {
   max-width: 1000px;
   border-radius: 12px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  text-align: center;
 }
 
 .book-detail h2 {
@@ -223,7 +224,8 @@ body {
 }
 
 .book-detail button {
-  margin-bottom: 20px;
+  margin-top: 15px;
+  margin-bottom: 10px;
   background: #2c3e50;
   color: white;
   padding: 10px 20px;
@@ -235,6 +237,22 @@ body {
 
 .book-detail button:hover {
   background: #1a242f;
+}
+
+.download-button {
+  display: inline-block;
+  padding: 10px 16px;
+  background-color: #4caf50;
+  color: white;
+  text-decoration: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  margin-top: 10px;
+  transition: background-color 0.3s ease;
+}
+
+.download-button:hover {
+  background-color: #388e3c;
 }
 
 @media (max-width: 768px) {
@@ -254,5 +272,9 @@ body {
 
   .section-title {
     font-size: 1.5rem;
+  }
+
+  .book-detail iframe {
+    height: 400px;
   }
 }
