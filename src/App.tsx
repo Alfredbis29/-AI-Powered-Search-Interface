@@ -82,7 +82,6 @@ function App() {
     }
   }, []);
 
-  // Check if pdfUrl is reachable by fetching HEAD
   const checkPdfAvailability = async (book: Book) => {
     if (!book.pdfUrl) {
       setPdfAvailability((prev) => ({ ...prev, [book.id]: false }));
@@ -97,7 +96,6 @@ function App() {
   };
 
   useEffect(() => {
-    // Check availability for popular books
     POPULAR_BOOKS.forEach((book) => {
       checkPdfAvailability(book);
     });
@@ -131,7 +129,6 @@ function App() {
           averageRating: item.volumeInfo.averageRating,
           ratingsCount: item.volumeInfo.ratingsCount,
           description: item.volumeInfo.description,
-          // No pdfUrl from Google API
         }));
         setSearchResults(books);
       } else {
